@@ -120,9 +120,9 @@
       <input type="text" id="answer-input" autocomplete="off" />
     </label>
     <br />
-
-    <button id="next-btn">Järgmine</button>
+ 
     <button id="check-btn">Kontrolli</button>
+    <button id="next-btn">Järgmine</button>
 
     <div id="feedback"></div>
 
@@ -383,7 +383,7 @@
         currentWords = daysAndDirs.slice();
         document.getElementById("mode-title").textContent = "Päevad ja suunad";
         document.getElementById("instructions").textContent =
-          "Küsitakse nädalapäevi, ilmakaari ja suundi (üles, alla, vasakule, paremale, edasi, tagasi). Kirjita hispaaniakeelne vastus.";
+          "Küsitakse nädalapäevi, ilmakaari ja suundi (üles, alla, vasakule, paremale, edasi, tagasi). Kirjuta hispaaniakeelne vastus.";
       }
 
       document.getElementById("mode-select").style.display = "none";
@@ -421,7 +421,7 @@
       const input = normalize(inputRaw);
       if (!input) {
         document.getElementById("feedback").textContent =
-          "Kirjita palun vastus enne kontrollimist.";
+          "Kirjuta palun vastus enne kontrollimist.";
         return;
       }
 
@@ -540,4 +540,5 @@
     }
   </script>
 </body>
+
 </html>
