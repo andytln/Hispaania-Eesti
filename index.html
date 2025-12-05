@@ -333,25 +333,17 @@
       return thousandsPart + " " + spanishNumber(rem);
     }
 
-    // Build a vocabulary list for numbers (used in Vocab view) containing 1-20, 25, 30, tens up to 100, hundreds and 1000 and some example numbers
     function buildNumberVocab() {
       const items = [];
-      // 1-20
       for (let i = 1; i <= 20; i++) items.push({ et: String(i), es: [spanishNumber(i), String(i)] });
-      // 25, 30
       [25, 30].forEach(n => items.push({ et: String(n), es: [spanishNumber(n), String(n)] }));
-      // tens up to 100 (40,50,...100) - 30 already included
       [40,50,60,70,80,90,100].forEach(n => items.push({ et: String(n), es: [spanishNumber(n), String(n)] }));
-      // hundreds
       for (let h = 1; h <= 9; h++) items.push({ et: String(h*100), es: [spanishNumber(h*100), String(h*100)] });
-      // thousand
       items.push({ et: "1000", es: [spanishNumber(1000), "1000"] });
-      // examples for tens with units
       [31,42,53,64,75,86,97].forEach(n => items.push({ et: String(n), es: [spanishNumber(n), String(n)] }));
       return items;
     }
 
-    // Build a large pool for numbers quiz: 1..1000
     function buildNumberPool() {
       const pool = [];
       for (let i = 1; i <= 1000; i++) {
@@ -360,7 +352,6 @@
       return pool;
     }
 
-    // utility: random sample of up to n items from array
     function randomSample(arr, n) {
       const copy = arr.slice();
       for (let i = copy.length - 1; i > 0; i--) {
@@ -377,16 +368,19 @@
     let usedIndices = [];
     let results = [];
     let currentMode = null;
-    let lastResult = null; // ainult VIIMANE vastatud küsimus
+    let lastResult = null;
 
-    // Speech Recognition
     let recognition = null;
     let recognizing = false;
 
     // -------- ABI --------
 
     function normalize(str) {
-      return String(str || "").toLowerCase().normalize("NFD").replace(/[[\\u0300-\\u036f]]/g, "").trim();
+      return String(str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")  // PARANDATUD regex
+        .trim();
     }
 
     function speak(text, lang) {
@@ -424,17 +418,15 @@
       document.getElementById("summary").innerHTML = "";
       renderLastResult();
 
-      const MAX_QUIZ = 15; // piirame kontrollis küsitavate ühikute arvu
+      const MAX_QUIZ = 15;
 
       if (mode === "body") {
-        // juhuslikult 15 sõna kehast
         const pool = bodyWords.slice();
         currentWords = randomSample(pool, Math.min(MAX_QUIZ, pool.length));
         document.getElementById("mode-title").textContent = "Kehaosad";
         document.getElementById("instructions").textContent =
           "Kuvatakse kehaosa eesti keeles. Kirjuta hispaaniakeelne vastus (võid kasutada ka slängi). Maksimaalselt 15 sõna.";
       } else if (mode === "numbers") {
-        // pool 1..1000, aga küsitakse kuni 15
         const pool = buildNumberPool();
         currentWords = randomSample(pool, Math.min(MAX_QUIZ, pool.length));
         document.getElementById("mode-title").textContent = "Numbrid";
@@ -466,7 +458,7 @@
       let index;
       do {
         index = Math.floor(Math.random() * currentWords.length);
-      } while (usedIndices.includes(index));
+      } while (usedIndices.indexOf(index) !== -1);
 
       usedIndices.push(index);
       currentWord = currentWords[index];
@@ -489,7 +481,7 @@
       }
 
       const correctNormalized = currentWord.es.map(normalize);
-      const isCorrect = correctNormalized.includes(input);
+      const isCorrect = correctNormalized.indexOf(input) !== -1;
 
       const feedback = document.getElementById("feedback");
       const correctText = currentWord.es.join(", ");
@@ -635,7 +627,6 @@
       }
     });
 
-    // Speech recognition setup
     function setupRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return null;
@@ -668,16 +659,13 @@
       }
     });
 
-    // PWA service worker
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         navigator.serviceWorker.register("service-worker.js").catch(function(e){console.error(e);});
       });
     }
 
-    // show initial view on load
     showInitial();
   </script>
 </body>
-
 </html>
